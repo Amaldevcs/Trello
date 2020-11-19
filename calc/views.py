@@ -15,13 +15,13 @@ def  home(request):
 def  complete(request):
 	global completed_list
 	uploaded_list = completed_list
-	completed_list = []
+	# completed_list = []
 	return render(request,'complete.html',{'uploaded_list':uploaded_list})
 
 def  success(request):
 	global completed_list
 	uploaded_list = completed_list
-	completed_list = []
+	# completed_list = []
 	return render(request,'success.html',{'uploaded_list':uploaded_list})
 
 def  wrong(request):
@@ -32,12 +32,14 @@ def  failed(request):
 	
 	global failed_list
 	failes = failed_list
-	failed_list = []
+	# failed_list = []
 	return render(request,'failed.html',{'failed_list':failes})
 
 
 def  uploadlist(request):
-	global failed_list
+	global failed_list,completed_list
+	completed_list = []
+	failed_list = []
 	try:
 		content = request.FILES['file']
 		alldata = content.read().decode("utf-8") 
@@ -48,7 +50,6 @@ def  uploadlist(request):
 		shortlink = str(request.POST["shortlink"])
 		board_id = getboard_id(shortlink)
 		list_id = getlist_id(board_id,list_name)
-		print(list_name)
 		for i in content_list:
 
 			board_id = getboard_id(i)
@@ -63,7 +64,9 @@ def  uploadlist(request):
 
 
 def  uploadcard(request):
-	global failed_list
+	global failed_list,completed_list
+	completed_list = []
+	failed_list = []
 	try:
 		content = request.FILES['file']
 		alldata = content.read().decode("utf-8") 
@@ -75,16 +78,10 @@ def  uploadcard(request):
 		# card_id = str(request.POST["cardid"])
 		board_id = getboard_id(shortlink)
 		list_id = getlist_id(board_id,list_name)
-		print(list_id)
 		card_id = getcard_id(list_id,card_name)
-		print(list_name)
 		for i in content_list:
-			print(content_list)
 			board_id = getboard_id(i)
-			print(board_id)
 			listidp = getlist_id(board_id,list_name)
-			print("###################")
-			print(listidp)
 			if listidp:
 				cardresp = postcard(board_id,listidp,card_id)
 				if cardresp.status_code != 200 :
@@ -99,7 +96,9 @@ def  uploadcard(request):
 		return HttpResponseRedirect("/wrong")
 
 def  deletelist(request):
-	global failed_list
+	global failed_list,completed_list
+	completed_list = []
+	failed_list = []
 	try:
 		content = request.FILES['file']
 		alldata = content.read().decode("utf-8") 
@@ -107,21 +106,16 @@ def  deletelist(request):
 		content.close()
 		list_name = str(request.POST["listname"])
 		# list_id = str(request.POST["listid"])
-		print(list_name)
 		for i in content_list:
 			
 			board_id = getboard_id(i)
 			listiddel = getlist_id(board_id,list_name)
-			print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-			print(listiddel)
 			if listiddel == None:
 				pass
 			else:
 				url = "https://api.trello.com/1/lists/"+str(listiddel)+"/closed"
-				print(url)
 				querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":"true"}
 				response = requests.request("PUT",url,params=querystring)
-				print(response.status_code)
 				if response.status_code != 200 :
 					failed_list = [x for x in content_list if x not in completed_list]
 					return HttpResponseRedirect("/failed")
@@ -131,7 +125,9 @@ def  deletelist(request):
 		return HttpResponseRedirect("/wrong")
 
 def  deletecard(request):
-	global failed_list
+	global failed_list,completed_list
+	completed_list = []
+	failed_list = []
 	try:
 		content = request.FILES['file']
 		alldata = content.read().decode("utf-8") 
@@ -140,13 +136,10 @@ def  deletecard(request):
 		list_name = str(request.POST["listname"])
 		card_name = str(request.POST["cardname"])
 		# list_id = str(request.POST["listid"])
-		print(list_name)
 		for i in content_list:
 			
 			board_id = getboard_id(i)
 			listiddel = getlist_id(board_id,list_name)
-			print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-			print(listiddel)
 			if listiddel == None:
 				pass
 			else:
@@ -192,7 +185,6 @@ def postlist(boardid,list_name,list_id):
     querystring = {"fields":"all","key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
     # querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":str(boardid)}
     response = requests.request("POST", url, params=querystring)
-    print(response.status_code)
     # response = requests.request("PUT", url, params=querystring)
     return response
 
@@ -219,7 +211,6 @@ def getcard_id(list_id,card_name):
 	querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
 	response = requests.request("GET", url, params=querystring)
 	res = (response.json())
-	print(res)
 	for lis in res:
 		if card_name == lis["name"]:
 			target_list = (lis["id"])
