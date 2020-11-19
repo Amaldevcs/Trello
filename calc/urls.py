@@ -4,6 +4,16 @@ from . import views
 
 urlpatterns = [
     path('', views.home,name="home"),
-    path('login', views.login,name="login"),
-    path('upload_list', views.uploadlist,name="upload_list")
+    path('uploadlist', views.uploadlist,name="uploadlist"),
+    path('uploadcard', views.uploadcard,name="uploadcard"),
+    path('deletelist', views.deletelist,name="deletelist"),
+    path('deletecard', views.deletecard,name="deletecard"),
+    path('complete', views.complete,name="complete"),
+    path('success', views.success,name="success"),
+    path('failed', views.failed,name="failed"),
+    path('wrong', views.wrong,name="wrong"),
+    path('upload_listform', views.uploadlistform,name="upload_listform"),
+    path('upload_cardform', views.uploadcardform,name="upload_cardform"),
+    path('delete_listform', views.deletelistform,name="delete_listform"),
+    path('delete_cardform', views.deletecardform,name="delete_cardform")
 ]

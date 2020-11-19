@@ -1,0 +1,54 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+<div id="cover-spin"></div>
+<div class="container" style="margin-top: 15%;">
+<form action="uploadlist" method="post"enctype="multipart/form-data" style="text-align: center;">{% csrf_token %} 
+    <input type="text" name="listname" placeholder="Enter The List Name" required style="margin-bottom: 10px;" onkeyup="manage(this)"><br> 
+    <input type="text" name="shortlink" placeholder="Enter The Master Bord Link"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br>  
+	<input type="file" name="file" onchange="manage(this)" style="margin-bottom: 10px; margin-left: 89px;"><br>
+	<input type="submit"  id="submit" onclick="$('#cover-spin').show(0)" value="UPLOAD" disabled>
+</form>
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+	// $(document).ready(
+ //    function(){
+ //        $('input:file').change(
+ //            function(){
+ //                if ($(this).val()) {
+ //                    $('input:submit').attr('disabled',false);
+ //                } 
+ //            }
+ //            );
+ //    });
+
+         function manage(txt) {
+                var bt = document.getElementById('submit');
+                var ele = document.getElementsByTagName('input'); 
+
+                // Loop through each element.
+                for (i = 0; i < ele.length; i++) {
+
+                    // Check the element type
+                    if ((ele[i].type == 'text' || ele[i].type == 'file' )  && ele[i].value == '') {
+                        bt.disabled = true;    // Disable the button.
+                        return false;
+                    }
+                    else {
+                        bt.disabled = false;   // Enable the button.
+                    }
+                }
+            }  
+</script>
+
+
+{% endblock %}
+

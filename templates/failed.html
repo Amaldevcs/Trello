@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+	<h1>Failed To Upload/Delete From Below boards (Updated in all other boards) : </h1> <br>
+	{% for list in failed_list %}
+		<h2> {{ forloop.counter }}. {{list}} </h2>
+	{% endfor %}
+
+{% endblock %}

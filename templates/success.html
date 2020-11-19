@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+	<h1>Deleted From  boards : </h1> <br>
+	{% for list in uploaded_list %}
+		<h2> {{ forloop.counter }}. {{list}} </h2>
+	{% endfor %}
+
+{% endblock %}
