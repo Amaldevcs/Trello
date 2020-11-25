@@ -217,3 +217,19 @@ def getcard_id(list_id,card_name):
 			return(target_list)
 		else:
 			pass
+
+def  urllist(request):
+	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/collect/urls/"
+	response = requests.request("GET", url)
+	resp = (response.json())
+	for i in resp['items']:
+		i['ly']="http://koj.biz/"+str(i['ly'])
+	return render(request,'urllist.html',{'resp':resp['items']})
+
+def  createurl(request):
+	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/koj/urlshort"
+	# response = requests.request("GET", url)
+	# resp = (response.json())
+	# for i in resp['items']:
+	# 	i['ly']="http://koj.biz/"+str(i['ly'])
+	return render(request,'createurl.html',{'resp':'AMAL'})

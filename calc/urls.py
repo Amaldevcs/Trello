@@ -15,5 +15,7 @@ urlpatterns = [
     path('upload_listform', views.uploadlistform,name="upload_listform"),
     path('upload_cardform', views.uploadcardform,name="upload_cardform"),
     path('delete_listform', views.deletelistform,name="delete_listform"),
-    path('delete_cardform', views.deletecardform,name="delete_cardform")
+    path('delete_cardform', views.deletecardform,name="delete_cardform"),
+    path('urllist', views.urllist,name="urllist"),
+    path('createurl', views.createurl,name="createurl")
 ]
