@@ -6,8 +6,8 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
 
-completed_list = []
-failed_list = []
+# completed_list = []
+# failed_list = []
 
 def  home(request):
 	return render(request,'home.html',{'name':'Amal'})
@@ -37,6 +37,7 @@ def  failed(request):
 
 
 def  uploadlist(request):
+	
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
