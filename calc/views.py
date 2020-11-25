@@ -30,14 +30,15 @@ def  wrong(request):
 
 def  failed(request):
 	
-	global failed_list
-	failes = failed_list
+	# global failed_list
+	# failes = failed_list
+	print(request.session['other_data'])
 	# failed_list = []
-	return render(request,'failed.html',{'failed_list':failes})
+	return render(request,'failed.html',{'failed_list':request.session['failed_list']})
 
 
 def  uploadlist(request):
-	
+
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
@@ -57,7 +58,10 @@ def  uploadlist(request):
 			postresp = postlist(board_id,list_name,list_id)
 			if postresp.status_code != 200 :
 				failed_list = [x for x in content_list if x not in completed_list]
-				return HttpResponseRedirect("/failed")
+				print(request)
+				request.path='/failed'
+				request.session['failed_list'] = failed_list
+				return HttpResponseRedirect(request.path)
 			completed_list.append(i)
 		return HttpResponseRedirect("/complete")
 	except:
@@ -234,3 +238,4 @@ def  createurl(request):
 	# for i in resp['items']:
 	# 	i['ly']="http://koj.biz/"+str(i['ly'])
 	return render(request,'createurl.html',{'resp':'AMAL'})
+
