@@ -4,6 +4,7 @@ import requests
 # Create your views here.
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 
 # completed_list = []
@@ -30,11 +31,10 @@ def  wrong(request):
 
 def  failed(request):
 	
-	# global failed_list
-	# failes = failed_list
-	print(request.session['other_data'])
+	global failed_list
+	failes = failed_list
 	# failed_list = []
-	return render(request,'failed.html',{'failed_list':request.session['failed_list']})
+	return render(request,'failed.html',{'failed_list':failes})
 
 
 def  uploadlist(request):
@@ -42,7 +42,7 @@ def  uploadlist(request):
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
-	try:
+	if request.method == 'POST':
 		content = request.FILES['file']
 		alldata = content.read().decode("utf-8") 
 		content_list = alldata.splitlines()
@@ -58,14 +58,20 @@ def  uploadlist(request):
 			postresp = postlist(board_id,list_name,list_id)
 			if postresp.status_code != 200 :
 				failed_list = [x for x in content_list if x not in completed_list]
-				print(request)
-				request.path='/failed'
-				request.session['failed_list'] = failed_list
-				return HttpResponseRedirect(request.path)
+				request.session['failed']=failed_list;
 			completed_list.append(i)
-		return HttpResponseRedirect("/complete")
-	except:
-		return HttpResponseRedirect("/wrong")
+		request.session['sucess']=completed_list;
+		return redirect(request.path)
+	if request.method =='GET':
+		failes=request.session.get('failed',False)
+		sucess=request.session.get('sucess',False)
+		if failes:
+			return render(request,'failed.html',{'failed_list':failes})
+		elif sucess:
+			return render(request,'success.html',{'uploaded_list':sucess})
+		else:
+			return HttpResponseRedirect("/uploadlist")
+	
 
 
 def  uploadcard(request):
