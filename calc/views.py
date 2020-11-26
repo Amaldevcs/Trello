@@ -43,32 +43,37 @@ def  uploadlist(request):
 	completed_list = []
 	failed_list = []
 	if request.method == 'POST':
-		content = request.FILES['file']
-		alldata = content.read().decode("utf-8") 
-		content_list = alldata.splitlines()
-		content.close()
-		list_name = str(request.POST["listname"])
-		# list_id = str(request.POST["listid"])
-		shortlink = str(request.POST["shortlink"])
-		board_id = getboard_id(shortlink)
-		list_id = getlist_id(board_id,list_name)
-		for i in content_list:
+		request.session['failed']= []
+		request.session['sucess']=[]
+		try:
+			content = request.FILES['file']
+			alldata = content.read().decode("utf-8") 
+			content_list = alldata.splitlines()
+			content.close()
+			list_name = str(request.POST["listname"])
+			# list_id = str(request.POST["listid"])
+			shortlink = str(request.POST["shortlink"])
+			board_id = getboard_id(shortlink)
+			list_id = getlist_id(board_id,list_name)
+			for i in content_list:
 
-			board_id = getboard_id(i)
-			postresp = postlist(board_id,list_name,list_id)
-			if postresp.status_code != 200 :
-				failed_list = [x for x in content_list if x not in completed_list]
-				request.session['failed']=failed_list;
-			completed_list.append(i)
-		request.session['sucess']=completed_list;
-		return redirect(request.path)
+				board_id = getboard_id(i)
+				postresp = postlist(board_id,list_name,list_id)
+				if postresp.status_code != 200 :
+					failed_list = [x for x in content_list if x not in completed_list]
+					request.session['failed']=failed_list;
+				completed_list.append(i)
+			request.session['sucess']=completed_list;
+			return redirect(request.path)
+		except:
+			return HttpResponseRedirect("/wrong")
 	if request.method =='GET':
 		failes=request.session.get('failed',False)
 		sucess=request.session.get('sucess',False)
 		if failes:
 			return render(request,'failed.html',{'failed_list':failes})
 		elif sucess:
-			return render(request,'success.html',{'uploaded_list':sucess})
+			return render(request,'complete.html',{'uploaded_list':sucess})
 		else:
 			return HttpResponseRedirect("/uploadlist")
 	
@@ -78,96 +83,148 @@ def  uploadcard(request):
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
-	try:
-		content = request.FILES['file']
-		alldata = content.read().decode("utf-8") 
-		content_list = alldata.splitlines()
-		content.close()
-		list_name = str(request.POST["listname"])
-		shortlink = str(request.POST["shortlink"])
-		card_name = str(request.POST["cardname"])
-		# card_id = str(request.POST["cardid"])
-		board_id = getboard_id(shortlink)
-		list_id = getlist_id(board_id,list_name)
-		card_id = getcard_id(list_id,card_name)
-		for i in content_list:
-			board_id = getboard_id(i)
-			listidp = getlist_id(board_id,list_name)
-			if listidp:
-				cardresp = postcard(board_id,listidp,card_id)
-				if cardresp.status_code != 200 :
-					failed_list = [x for x in content_list if x not in completed_list]
-					return HttpResponseRedirect("/failed")
-				completed_list.append(i)
+	if request.method == 'POST':
+		request.session['failed']= []
+		request.session['sucess']=[]
+		try:
+			content = request.FILES['file']
+			alldata = content.read().decode("utf-8") 
+			content_list = alldata.splitlines()
+			content.close()
+			list_name = str(request.POST["listname"])
+			shortlink = str(request.POST["shortlink"])
+			card_name = str(request.POST["cardname"])
+			# card_id = str(request.POST["cardid"])
+			board_id = getboard_id(shortlink)
+			list_id = getlist_id(board_id,list_name)
+			card_id = getcard_id(list_id,card_name)
+			if card_id:
+				for i in content_list:
+					board_id = getboard_id(i)
+					listidp = getlist_id(board_id,list_name)
+					if listidp:
+						cardresp = postcard(board_id,listidp,card_id)
+						if cardresp.status_code != 200 :
+							failed_list = [x for x in content_list if x not in completed_list]
+							request.session['failed']=failed_list;
+						completed_list.append(i)
+						request.session['sucess']=completed_list;	
+					else:
+						pass
+					
+				return redirect(request.path)
 			else:
-				pass
-			
-		return HttpResponseRedirect("/complete")
-	except:
-		return HttpResponseRedirect("/wrong")
+				return HttpResponseRedirect("/wrong")
+		except:
+			return HttpResponseRedirect("/wrong")
+	if request.method =='GET':
+		failes=request.session.get('failed',False)
+		sucess=request.session.get('sucess',False)
+		if failes:
+			return render(request,'failed.html',{'failed_list':failes})
+		elif sucess:
+			return render(request,'complete.html',{'uploaded_list':sucess})
+		else:
+			return HttpResponseRedirect("/uploadcard")
 
 def  deletelist(request):
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
-	try:
-		content = request.FILES['file']
-		alldata = content.read().decode("utf-8") 
-		content_list = alldata.splitlines()
-		content.close()
-		list_name = str(request.POST["listname"])
-		# list_id = str(request.POST["listid"])
-		for i in content_list:
-			
-			board_id = getboard_id(i)
-			listiddel = getlist_id(board_id,list_name)
-			if listiddel == None:
-				pass
+	if request.method == 'POST':
+		request.session['failed']= []
+		request.session['sucess']=[]
+		try:
+			content = request.FILES['file']
+			alldata = content.read().decode("utf-8") 
+			content_list = alldata.splitlines()
+			content.close()
+			list_name = str(request.POST["listname"])
+			# list_id = str(request.POST["listid"])
+			for i in content_list:
+				
+				board_id = getboard_id(i)
+				listiddel = getlist_id(board_id,list_name)
+				print(listiddel)
+				if listiddel:
+					print("433333333")
+					url = "https://api.trello.com/1/lists/"+str(listiddel)+"/closed"
+					querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":"true"}
+					response = requests.request("PUT",url,params=querystring)
+					if response.status_code != 200 :
+						failed_list = [x for x in content_list if x not in completed_list]
+						request.session['failed']=failed_list;
+					completed_list.append(i)
+				else:
+					pass
+				request.session['sucess']=completed_list;
+			if len(request.session['sucess']) == 0:
+				return HttpResponseRedirect("/wrong")
 			else:
-				url = "https://api.trello.com/1/lists/"+str(listiddel)+"/closed"
-				querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":"true"}
-				response = requests.request("PUT",url,params=querystring)
-				if response.status_code != 200 :
-					failed_list = [x for x in content_list if x not in completed_list]
-					return HttpResponseRedirect("/failed")
-				completed_list.append(i)
-		return HttpResponseRedirect("/success")
-	except:
-		return HttpResponseRedirect("/wrong")
+				return redirect(request.path)
+		except:
+			return HttpResponseRedirect("/wrong")
+	if request.method =='GET':
+		failes=request.session.get('failed',False)
+		sucess=request.session.get('sucess',False)
+		if failes:
+			return render(request,'failed.html',{'failed_list':failes})
+		elif sucess:
+			return render(request,'success.html',{'uploaded_list':sucess})
+		else:
+			return HttpResponseRedirect("/deletelist")
+
 
 def  deletecard(request):
 	global failed_list,completed_list
 	completed_list = []
 	failed_list = []
-	try:
-		content = request.FILES['file']
-		alldata = content.read().decode("utf-8") 
-		content_list = alldata.splitlines()
-		content.close()
-		list_name = str(request.POST["listname"])
-		card_name = str(request.POST["cardname"])
-		# list_id = str(request.POST["listid"])
-		for i in content_list:
-			
-			board_id = getboard_id(i)
-			listiddel = getlist_id(board_id,list_name)
-			if listiddel == None:
-				pass
-			else:
-				card_id = getcard_id(listiddel,card_name)
-				if card_id:
-					querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
-					url = "https://api.trello.com/1/cards/" + card_id
-					response = requests.request("DELETE",url,params=querystring)
-					if response.status_code != 200 :
-						failed_list = [x for x in content_list if x not in completed_list]
-						return HttpResponseRedirect("/failed")
-					completed_list.append(i)
-				else:
+	if request.method == 'POST':
+		request.session['failed']= []
+		request.session['sucess']=[]
+		try:
+			content = request.FILES['file']
+			alldata = content.read().decode("utf-8") 
+			content_list = alldata.splitlines()
+			content.close()
+			list_name = str(request.POST["listname"])
+			card_name = str(request.POST["cardname"])
+			# list_id = str(request.POST["listid"])
+			for i in content_list:
+				
+				board_id = getboard_id(i)
+				listiddel = getlist_id(board_id,list_name)
+				if listiddel == None:
 					pass
-		return HttpResponseRedirect("/success")
-	except:
-		return HttpResponseRedirect("/wrong")
+				else:
+					card_id = getcard_id(listiddel,card_name)
+					if card_id:
+						querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
+						url = "https://api.trello.com/1/cards/" + card_id
+						response = requests.request("DELETE",url,params=querystring)
+						if response.status_code != 200 :
+							failed_list = [x for x in content_list if x not in completed_list]
+							request.session['failed']=failed_list;
+						completed_list.append(i)
+						request.session['sucess']=completed_list;
+					else:
+						pass
+			if len(request.session['sucess']) == 0:
+				return HttpResponseRedirect("/wrong")
+			else:
+				return redirect(request.path)
+		except:
+			return HttpResponseRedirect("/wrong")
+	if request.method =='GET':
+		failes=request.session.get('failed',False)
+		sucess=request.session.get('sucess',False)
+		if failes:
+			return render(request,'failed.html',{'failed_list':failes})
+		elif sucess:
+			return render(request,'success.html',{'uploaded_list':sucess})
+		else:
+			return HttpResponseRedirect("/deletecard")
+
 
 
 
