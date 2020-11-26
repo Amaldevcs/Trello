@@ -62,7 +62,11 @@ def  uploadlist(request):
 				if postresp.status_code != 200 :
 					failed_list = [x for x in content_list if x not in completed_list]
 					request.session['failed']=failed_list;
-				completed_list.append(i)
+				if postresp.status_code ==200:
+					completed_list.append(i)
+					failed_list = [x for x in content_list if x not in completed_list]
+					request.session['failed']=failed_list;
+
 			request.session['sucess']=completed_list;
 			return redirect(request.path)
 		except:
@@ -107,7 +111,10 @@ def  uploadcard(request):
 						if cardresp.status_code != 200 :
 							failed_list = [x for x in content_list if x not in completed_list]
 							request.session['failed']=failed_list;
-						completed_list.append(i)
+						if cardresp.status_code ==200:
+							completed_list.append(i)
+							failed_list = [x for x in content_list if x not in completed_list]
+							request.session['failed']=failed_list;
 						request.session['sucess']=completed_list;	
 					else:
 						pass
@@ -145,16 +152,17 @@ def  deletelist(request):
 				
 				board_id = getboard_id(i)
 				listiddel = getlist_id(board_id,list_name)
-				print(listiddel)
 				if listiddel:
-					print("433333333")
 					url = "https://api.trello.com/1/lists/"+str(listiddel)+"/closed"
 					querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":"true"}
 					response = requests.request("PUT",url,params=querystring)
 					if response.status_code != 200 :
 						failed_list = [x for x in content_list if x not in completed_list]
 						request.session['failed']=failed_list;
-					completed_list.append(i)
+					if response.status_code == 200 :
+						completed_list.append(i)
+						failed_list = [x for x in content_list if x not in completed_list]
+						request.session['failed']=failed_list;
 				else:
 					pass
 				request.session['sucess']=completed_list;
@@ -205,7 +213,10 @@ def  deletecard(request):
 						if response.status_code != 200 :
 							failed_list = [x for x in content_list if x not in completed_list]
 							request.session['failed']=failed_list;
-						completed_list.append(i)
+						if response.status_code == 200 :
+							completed_list.append(i)
+							failed_list = [x for x in content_list if x not in completed_list]
+							request.session['failed']=failed_list;
 						request.session['sucess']=completed_list;
 					else:
 						pass
