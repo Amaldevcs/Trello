@@ -50,6 +50,7 @@ def  uploadlist(request):
 			alldata = content.read().decode("utf-8") 
 			content_list = alldata.splitlines()
 			content.close()
+			content_list = list(filter(None, content_list))
 			list_name = str(request.POST["listname"])
 			# list_id = str(request.POST["listid"])
 			shortlink = str(request.POST["shortlink"])
@@ -99,6 +100,7 @@ def  uploadcard(request):
 			shortlink = str(request.POST["shortlink"])
 			card_name = str(request.POST["cardname"])
 			# card_id = str(request.POST["cardid"])
+			content_list = list(filter(None, content_list))
 			board_id = getboard_id(shortlink)
 			list_id = getlist_id(board_id,list_name)
 			card_id = getcard_id(list_id,card_name)
@@ -147,6 +149,7 @@ def  deletelist(request):
 			content_list = alldata.splitlines()
 			content.close()
 			list_name = str(request.POST["listname"])
+			content_list = list(filter(None, content_list))
 			# list_id = str(request.POST["listid"])
 			for i in content_list:
 				
@@ -198,6 +201,7 @@ def  deletecard(request):
 			list_name = str(request.POST["listname"])
 			card_name = str(request.POST["cardname"])
 			# list_id = str(request.POST["listid"])
+			content_list = list(filter(None, content_list))
 			for i in content_list:
 				
 				board_id = getboard_id(i)
@@ -255,8 +259,12 @@ def  deletecardform(request):
 def getboard_id(shortlink):
     urlshrt = "https://trello.com/b/" + shortlink + ".json"
     querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
-    response = requests.request("GET", urlshrt, params=querystring)
-    return response.json()["id"]
+    # response = requests.request("GET", urlshrt, params=querystring)
+    try:
+    	response = requests.request("GET", urlshrt, params=querystring)
+    	return response.json()["id"]
+    except:
+    	return "123123"
  
 def postlist(boardid,list_name,list_id):
     url = "https://api.trello.com/1/lists?name="+ str(list_name) +"&idBoard="+ boardid +"&idListSource="+ list_id +"&pos=top"
