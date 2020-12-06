@@ -361,9 +361,9 @@ def  posturl(request):
 	shorturl = str(request.POST["shorturl"])
 	longurl = str(request.POST["longurl"])
 	createdby = str(request.POST["createdby"])
-	dt = datetime.datetime.now()
-	seq = int(dt.strftime("%Y%m%d%H%M%S"))
-	querystring = {"id":str(seq),"shorturl":shorturl,"longurl":longurl,"created_by":createdby,"updated_by":createdby}
+	# dt = datetime.datetime.now()
+	# seq = int(dt.strftime("%Y%m%d%H%M%S"))
+	querystring = {"shorturl":shorturl,"longurl":longurl,"created_by":createdby,"updated_by":createdby}
 	response = requests.request("POST", url, params=querystring)
 	return HttpResponseRedirect("/urllist")
 

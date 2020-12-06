@@ -9,7 +9,7 @@
 		<form action="posturl" method="post"enctype="multipart/form-data" style="text-align: left;">{% csrf_token %} 
 		    <input type="text" name="shorturl" placeholder="Enter The Short URL" required style="margin-bottom: 10px;" onkeyup="manage(this)"><br> 
 		    <input type="text" name="longurl" placeholder="Enter The Long URL"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br> 
-		    <input type="text" name="createdby" placeholder="Enter Your ID"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br>  
+		    <input type="text" name="createdby" placeholder="Enter Your EMPID"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br>  
 			<input type="submit"  id="submit" onclick="$('#cover-spin').show(0)" value="CREATE" disabled style="margin-bottom: 10px; margin-left: 45%">
 		</form>
 	</div>
