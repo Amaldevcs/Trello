@@ -3,7 +3,56 @@
 
 
 {% block content %}
-	<h1>Deleted From  boards : </h1> <br>
-	
+
+	<div id="cover-spin"></div>
+	<div class="container">
+		<form action="posturl" method="post"enctype="multipart/form-data" style="text-align: left;">{% csrf_token %} 
+		    <input type="text" name="shorturl" placeholder="Enter The Short URL" required style="margin-bottom: 10px;" onkeyup="manage(this)"><br> 
+		    <input type="text" name="longurl" placeholder="Enter The Long URL"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br> 
+		    <input type="text" name="createdby" placeholder="Enter Your ID"required style="margin-bottom: 10px;" onkeyup="manage(this)"><br>  
+			<input type="submit"  id="submit" onclick="$('#cover-spin').show(0)" value="CREATE" disabled style="margin-bottom: 10px; margin-left: 45%">
+		</form>
+	</div>
+
+
+<script type="text/javascript">
+         function manage(txt) {
+                var bt = document.getElementById('submit');
+                var ele = document.getElementsByTagName('input'); 
+
+                // Loop through each element.
+                for (i = 0; i < ele.length; i++) {
+
+                    // Check the element type
+                    if ((ele[i].type == 'text' )  && ele[i].value == '') {
+                        bt.disabled = true;    // Disable the button.
+                        return false;
+                    }
+                    else {
+                        bt.disabled = false;   // Enable the button.
+                    }
+                }
+            }  
+</script>
+
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+form {border: 3px solid #f1f1f1;}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.container {
+  padding: 16px;
+}
+</style>
+
+
 
 {% endblock %}

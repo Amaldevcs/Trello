@@ -1,10 +1,12 @@
 from django.shortcuts import render
-import time
+import datetime
 import requests
 # Create your views here.
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.contrib import messages
+from django.contrib.auth.models import auth,User
 
 
 # completed_list = []
@@ -244,16 +246,46 @@ def  deletecard(request):
 
 
 def  uploadlistform(request):
-	return render(request,'listupload.html',{'name':''})
+	if request.user.is_authenticated:
+		for group in request.user.groups.all():
+			if str(group) == 'Trello':
+				return render(request,'listupload.html',{'name':''})
+			
+	else:
+		return HttpResponseRedirect("/login")
+		
 
 def  uploadcardform(request):
-	return render(request,'cardupload.html',{'name':''})
+	if request.user.is_authenticated:
+		for group in request.user.groups.all():
+			if str(group) == 'Trello':
+				return render(request,'cardupload.html',{'name':''})
+	else:
+		return HttpResponseRedirect("/login")
+
+		
 
 def  deletelistform(request):
-	return render(request,'listdelete.html',{'name':''})
+	if request.user.is_authenticated:
+		for group in request.user.groups.all():
+			if str(group) == 'Trello':
+				return render(request,'listdelete.html',{'name':''})
+	else:
+		return HttpResponseRedirect("/login")
+
+	
 
 def  deletecardform(request):
-	return render(request,'carddelete.html',{'name':''})
+	if request.user.is_authenticated:
+		for group in request.user.groups.all():
+			if str(group) == 'Trello' and request.user.is_authenticated:
+				return render(request,'carddelete.html',{'name':''})
+			else:
+				return HttpResponseRedirect("/login")
+	else:
+		return HttpResponseRedirect("/login")
+
+	
 
 
 def getboard_id(shortlink):
@@ -311,13 +343,44 @@ def  urllist(request):
 	resp = (response.json())
 	for i in resp['items']:
 		i['ly']="http://koj.biz/"+str(i['ly'])
+		i['delete'] = i ['id']
 	return render(request,'urllist.html',{'resp':resp['items']})
 
 def  createurl(request):
-	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/koj/urlshort"
-	# response = requests.request("GET", url)
-	# resp = (response.json())
-	# for i in resp['items']:
-	# 	i['ly']="http://koj.biz/"+str(i['ly'])
-	return render(request,'createurl.html',{'resp':'AMAL'})
+	if request.user.is_authenticated:
+		for group in request.user.groups.all():
+			if str(group) == 'Short URL':
+				return render(request,'createurl.html',{'resp':''})
+			
+	else:
+		return HttpResponseRedirect("/login")
+	
 
+def  posturl(request):
+	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/koj/urlshort"
+	shorturl = str(request.POST["shorturl"])
+	longurl = str(request.POST["longurl"])
+	createdby = str(request.POST["createdby"])
+	dt = datetime.datetime.now()
+	seq = int(dt.strftime("%Y%m%d%H%M%S"))
+	querystring = {"id":str(seq),"shorturl":shorturl,"longurl":longurl,"created_by":createdby,"updated_by":createdby}
+	response = requests.request("POST", url, params=querystring)
+	return HttpResponseRedirect("/urllist")
+
+def  login(request):
+	if request.method == 'POST':
+		username = request.POST["username"]
+		password = request.POST["password"]
+		user = auth.authenticate(username=username,password=password)
+		if user is not None:
+			auth.login(request,user)
+			return HttpResponseRedirect("/")
+		else:
+			messages.info(request,'Invalid Credentials')
+			return HttpResponseRedirect("/login")
+	else:
+		return render(request,'login.html',{'resp':''})
+
+def  logout(request):
+	auth.logout(request)
+	return HttpResponseRedirect("/")

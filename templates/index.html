@@ -29,16 +29,27 @@
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="selected"><a href="/">Home</a></li>
           <!-- <li><a class="dropdown" href="upload_listform">Trello</a></li> -->
-          <li class="dropdown">
-            <a class="dropbtn" style="float: initial;">Trello</a>
-            <div class="dropdown-content" style="box-shadow: 0 0 black;margin-left: -11px;">
-              <a class="minwidth" href="upload_listform">List Upload</a>
-              <a class="minwidth" href="upload_cardform">Card Upload</a>
-              <a class="minwidth" href="delete_listform">Delete List</a>
-              <a class="minwidth" href="delete_cardform">Delete Card</a>
-            </div>
-          </li>
-          <li ><a href="urllist">Short URL</a></li>
+          {% if user.is_authenticated %}
+            {% for group in user.groups.all %}
+              {% if group.name == 'Trello'  %}
+                   <li class="dropdown">
+                      <a class="dropbtn" style="float: initial;">Trello</a>
+                      <div class="dropdown-content" style="box-shadow: 0 0 black;margin-left: -11px;">
+                        <a class="minwidth" href="upload_listform">List Upload</a>
+                        <a class="minwidth" href="upload_cardform">Card Upload</a>
+                        <a class="minwidth" href="delete_listform">Delete List</a>
+                        <a class="minwidth" href="delete_cardform">Delete Card</a>
+                      </div>
+                    </li>
+              {% endif %}
+              {% if group.name == 'Short URL'  %}
+                <li ><a href="urllist">Short URL</a></li>
+              {% endif %}
+            {% endfor %}
+              <li ><a href="logout">Logout</a></li>
+          {% else %}
+            <li ><a href="login">Login</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>

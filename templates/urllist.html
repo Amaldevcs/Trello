@@ -3,23 +3,28 @@
 
 
 {% block content %}
+<div id="snackbar">Some text some message..</div>
 <div style="margin-right:-246px; text-align: right;font-size:15px;color:#FFF;margin-bottom: 20px;">
   <i class="fa fa-plus" style="background-color: #5A5A5A;cursor: pointer"> 
     <a href="createurl" style="color:#FFF;">Create </a>
   </i>
 </div>	
-<table id="customers">
+<table id="customers" style="width: 141%;table-layout: fixed;">
   <tr>
-    <th style="text-align: center">ID</th>
-    <th style="text-align: center">Short URL</th>
-    <th style="text-align: center">Original URL</th>
+  <th style="text-align: center; width: 12%">ID</th>
+  <th style="text-align: center; width: 23%">Short URL</th>
+  <th style="text-align: center; width: 59%">Original URL</th>
   </tr>
   {% for list in resp %}
     <tr>
       {% for key,value in list.items %}
-        <td style="padding: 7px 1px;">{{value}}</td>
+          {% if key != 'delete' %}
+              <td style="padding: 7px 1px; overflow: hidden;">{{value}}</td>
+          {% endif %}
+          {% if key == 'delete' %}
+          <td style="padding: 7px 1px; background-color: #f52626; color: #E5E5DB; cursor: pointer;border-radius: 6px;" onclick="delmodal({{value}})">DELETE</td>
+          {% endif %}
       {% endfor %}
-      <td style="padding: 7px 1px; background-color: #f52626; color: #E5E5DB; cursor: pointer;border-radius: 6px;" onclick="document.getElementById('id01').style.display='block'">DELETE</td>
     </tr>
   {% endfor %}
 
@@ -34,49 +39,117 @@
     
       <div class="clearfix">
         <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="deletebtn">Delete</button>
+        <button type="button" onclick="delmodal('N')" class="deletebtn">Delete</button>
       </div>
     </div>
   </form>
 </div>
 
 
-{% endblock %}
-
-
-<style>
-#customers {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-#customers td, #customers th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-#customers tr:nth-child(even){background-color: #f2f2f2;}
-
-#customers tr:hover {background-color: #ddd;}
-
-#customers th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #4CAF50;
-  color: white;
-}
-</style>
-
 <script>
 // Get the modal
 var modal = document.getElementById('id01');
 
 // When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
+// window.onclick = function(event) {
+//   if (event.target == modal) {
+//     modal.style.display = "none";
+//   }
+// }
+
+function showToast(content = "Unknown error") { //You can change the default value
+  // Get the snackbar DIV
+  var x = document.getElementById("snackbar");
+  
+  //Change the text (not mandatory, but I think you might be willing to do it)
+  x.innerHTML = content;
+
+  // Add the "show" class to DIV
+  x.className = "show";
+
+  // After 3 seconds, remove the show class from DIV
+  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+function delmodal(item) {
+    if (item === 'N'){
+      var id = localStorage.getItem("urlid");
+       $.post("http://peuat.mihyar.com:9090/ords/wsmhuat/koj/delete",
+      {
+        "id": id.toString()
+      },
+      function(data,status){
+          if(status = 'success'){
+              modal.style.display = "none";
+              showToast("Deleted URL Successfully");
+              $(document).ready(function () { 
+                setTimeout(function () { 
+                  location.reload(true); 
+                }, 3000); 
+              }); 
+          }
+          else{
+              modal.style.display = "none";
+              location.reload();
+              showToast("Failed");
+          }
+      });
+    }
+  else {
+    document.getElementById('id01').style.display='block'
+    console.log("fdfdfdf")
+    console.log(item)
+    localStorage.setItem("urlid", item);
   }
 }
 </script>
+<style>
+  /* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: green; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 80%; /* Center the snackbar */
+  top: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.8s, fadeout 0.8s 10s;
+  animation: fadein 0.8s, fadeout 0.8s 10s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {top: 0; opacity: 0;}
+  to {top: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {top: 0; opacity: 0;}
+  to {top: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {top: 30px; opacity: 1;}
+  to {top: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {top: 30px; opacity: 1;}
+  to {top: 0; opacity: 0;}
+}
+
+</style>
+
+{% endblock %}

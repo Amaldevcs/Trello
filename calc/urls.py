@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.home,name="home"),
+    path('login', views.login,name="login"),
+    path('logout', views.logout,name="logout"),
     path('uploadlist', views.uploadlist,name="uploadlist"),
     path('uploadcard', views.uploadcard,name="uploadcard"),
     path('deletelist', views.deletelist,name="deletelist"),
@@ -17,5 +19,6 @@ urlpatterns = [
     path('delete_listform', views.deletelistform,name="delete_listform"),
     path('delete_cardform', views.deletecardform,name="delete_cardform"),
     path('urllist', views.urllist,name="urllist"),
-    path('createurl', views.createurl,name="createurl")
+    path('createurl', views.createurl,name="createurl"),
+    path('posturl', views.posturl,name="posturl")
 ]
