@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import datetime
-import requests
+import requests,time
 # Create your views here.
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -56,12 +56,18 @@ def  uploadlist(request):
 			list_name = str(request.POST["listname"])
 			# list_id = str(request.POST["listid"])
 			shortlink = str(request.POST["shortlink"])
+			print("ddfdfdfdgdgd")
 			board_id = getboard_id(shortlink)
+			print(board_id)
+			time.sleep(5)
 			list_id = getlist_id(board_id,list_name)
+			time.sleep(5)
 			for i in content_list:
 
 				board_id = getboard_id(i)
+				time.sleep(5)
 				postresp = postlist(board_id,list_name,list_id)
+				time.sleep(5)
 				if postresp.status_code != 200 :
 					failed_list = [x for x in content_list if x not in completed_list]
 					request.session['failed']=failed_list;
@@ -71,7 +77,7 @@ def  uploadlist(request):
 					request.session['failed']=failed_list;
 
 			request.session['sucess']=completed_list;
-			return redirect(request.path)
+			return redirect("/uploadlist")
 		except:
 			return HttpResponseRedirect("/wrong")
 	if request.method =='GET':
@@ -294,6 +300,7 @@ def getboard_id(shortlink):
     # response = requests.request("GET", urlshrt, params=querystring)
     try:
     	response = requests.request("GET", urlshrt, params=querystring)
+    	time.sleep(5)
     	return response.json()["id"]
     except:
     	return "123123"
@@ -304,6 +311,7 @@ def postlist(boardid,list_name,list_id):
     querystring = {"fields":"all","key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
     # querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f","value":str(boardid)}
     response = requests.request("POST", url, params=querystring)
+    time.sleep(5)
     # response = requests.request("PUT", url, params=querystring)
     return response
 
@@ -311,6 +319,7 @@ def getlist_id(lst,list_name):
 	url = "https://api.trello.com/1/boards/"+lst+"/lists"
 	querystring = {"fields":"all","key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
 	response = requests.request("GET", url, params=querystring)
+	time.sleep(5)
 	res = (response.json())
 	for lis in res:
 		lis_name = (lis["name"])
