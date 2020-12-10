@@ -338,7 +338,7 @@ def getcard_id(list_id,card_name):
 			pass
 
 def  urllist(request):
-	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/collect/urls/"
+	url = "http://peuat.mihyar.com:9090/ords/wsmhprd/koj/list/"
 	response = requests.request("GET", url)
 	resp = (response.json())
 	for i in resp['items']:
@@ -357,13 +357,13 @@ def  createurl(request):
 	
 
 def  posturl(request):
-	url = "http://peuat.mihyar.com:9090/ords/wsmhuat/koj/urlshort"
+	url = "http://peuat.mihyar.com:9090/ords/wsmhprd/koj/add"
 	shorturl = str(request.POST["shorturl"])
 	longurl = str(request.POST["longurl"])
 	createdby = str(request.POST["createdby"])
 	# dt = datetime.datetime.now()
 	# seq = int(dt.strftime("%Y%m%d%H%M%S"))
-	querystring = {"shorturl":shorturl,"longurl":longurl,"created_by":createdby,"updated_by":createdby}
+	querystring = {"ly":shorturl,"url":longurl,"created_by":createdby,"updated_by":createdby}
 	response = requests.request("POST", url, params=querystring)
 	return HttpResponseRedirect("/urllist")
 
