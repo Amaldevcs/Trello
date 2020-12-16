@@ -20,5 +20,6 @@ urlpatterns = [
     path('delete_cardform', views.deletecardform,name="delete_cardform"),
     path('urllist', views.urllist,name="urllist"),
     path('createurl', views.createurl,name="createurl"),
-    path('posturl', views.posturl,name="posturl")
+    path('posturl', views.posturl,name="posturl"),
+    path('oracle', views.oracle,name="oracle")
 ]

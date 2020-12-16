@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import datetime
-import requests
+import requests,cx_Oracle
 # Create your views here.
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -263,7 +263,15 @@ def  uploadcardform(request):
 	else:
 		return HttpResponseRedirect("/login")
 
-		
+def  oracle(request):
+	cx_Oracle.init_oracle_client(lib_dir=r'/home/ubuntu/Oracle_instant_Clint/instantclient_19_9')
+	dsn_tns = cx_Oracle.makedsn('omsprod.c7cgvrmwurll.me-south-1.rds.amazonaws.com', '1521', service_name='omsprod')
+	conn = cx_Oracle.connect(user='kojuser', password='koj$U$er#107',dsn=dsn_tns)
+	c = conn.cursor()
+	# c.execute('select 1 from dual') # use triple quotes if you want to spread your query across multiple lines
+	c.execute("select * from omsproduser.koj_oms_custord oh, omsproduser.koj_oms_custord_item oi where oh.oms_order_id = oi.oms_order_id and oh.order_id in ('1252031558')");
+	for row in c:
+    		return render(request,'oracle.html',{'name':row})	
 
 def  deletelistform(request):
 	if request.user.is_authenticated:
@@ -293,7 +301,9 @@ def getboard_id(shortlink):
     querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
     # response = requests.request("GET", urlshrt, params=querystring)
     try:
+    	print("GDFHFHGFHGHGFHGHGHGF")
     	response = requests.request("GET", urlshrt, params=querystring)
+    	print(response)
     	return response.json()["id"]
     except:
     	return "123123"
