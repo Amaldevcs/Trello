@@ -1,6 +1,6 @@
 from django.shortcuts import render
 import datetime
-import requests,cx_Oracle
+import requests,cx_Oracle,json
 # Create your views here.
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -264,7 +264,7 @@ def  uploadcardform(request):
 		return HttpResponseRedirect("/login")
 
 def  oracle(request):
-	cx_Oracle.init_oracle_client(lib_dir=r'/home/ubuntu/Oracle_instant_Clint/instantclient_19_9')
+	cx_Oracle.init_oracle_client(lib_dir=r'C:\Amal\instantclient_19_9')
 	dsn_tns = cx_Oracle.makedsn('omsprod.c7cgvrmwurll.me-south-1.rds.amazonaws.com', '1521', service_name='omsprod')
 	conn = cx_Oracle.connect(user='kojuser', password='koj$U$er#107',dsn=dsn_tns)
 	c = conn.cursor()
@@ -348,7 +348,7 @@ def getcard_id(list_id,card_name):
 			pass
 
 def  urllist(request):
-	url = "http://peuat.mihyar.com:9090/ords/wsmhprd/koj/list/"
+	url = "http://ords.kojtechservices.com:9090/ords/wsdigital/koj/list/"
 	response = requests.request("GET", url)
 	resp = (response.json())
 	for i in resp['items']:
@@ -367,14 +367,15 @@ def  createurl(request):
 	
 
 def  posturl(request):
-	url = "http://peuat.mihyar.com:9090/ords/wsmhprd/koj/add"
+	url = "http://ords.kojtechservices.com:9090/ords/wsdigital/koj/add/"
 	shorturl = str(request.POST["shorturl"])
 	longurl = str(request.POST["longurl"])
 	createdby = str(request.POST["createdby"])
 	# dt = datetime.datetime.now()
 	# seq = int(dt.strftime("%Y%m%d%H%M%S"))
 	querystring = {"ly":shorturl,"url":longurl,"created_by":createdby,"updated_by":createdby}
-	response = requests.request("POST", url, params=querystring)
+	headers = {'content-type': 'application/json'}
+	response = requests.post(url, data=json.dumps(querystring),headers=headers)
 	return HttpResponseRedirect("/urllist")
 
 def  login(request):

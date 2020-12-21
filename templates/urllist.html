@@ -74,7 +74,7 @@ function showToast(content = "Unknown error") { //You can change the default val
 function delmodal(item) {
     if (item === 'N'){
       var id = localStorage.getItem("urlid");
-       $.post("http://peuat.mihyar.com:9090/ords/wsmhprd/koj/delete",
+       $.post("http://ords.kojtechservices.com:9090/ords/wsdigital/koj/delete/",
       {
         "id": id.toString()
       },
