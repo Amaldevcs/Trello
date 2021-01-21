@@ -395,3 +395,102 @@ def  login(request):
 def  logout(request):
 	auth.logout(request)
 	return HttpResponseRedirect("/")
+
+
+def  cmsdata(request):
+	output = naycmsdata(request)
+	if output == 'sucess':
+		missing = omsmissed(request)
+	return render(request,'cmsdata.html',{'resp':missing})
+
+def  naycmsdata(request):
+	from_date = (datetime.datetime.now() - datetime.timedelta(hours = 24)).strftime("%d%m%Y")
+	to_date = datetime.datetime.now().strftime("%d%m%Y")
+	todate_mik = datetime.date.today()
+	fromdate_mik = todate_mik - datetime.timedelta(days=1)
+	miktokenurl = "https://mikyajy.com/rest/V1/integration/admin/token"
+	cred = {
+			"username": "sandeep",
+			"password": "testkoj@123"
+			}
+	tokenresponse = requests.post(miktokenurl, data=json.dumps(cred),headers={'content-type': 'application/json'})
+	cmslist = {
+				"NAY" : ["https://cms.nayomi.com/index.php/rest/V1/app/dataextractionnew/orderlist?from="+from_date+"&to="+to_date,"q7fhtd4w5ysvzbsg8v86ydf6epnyhf2m","NAY"],
+				"MHR" : ["https://cms.mihyar.com/index.php/rest//V1/app/dataextractionnew/orderlist/?from="+from_date+"&to="+to_date,"ij6yeko9mb9gv5u2wt4o0wqnuuhf6m0k","MHR"],
+				"TBS" : ["https://cms-west.thebodyshop.com.sa/rest/V1/app/dataextractionnew/orderlist?from="+from_date+"&to="+to_date,"vbv8ehbgxp0lw9ocn0sleivythovkqvu","TBS"],
+				"ELC" : ["https://cms.elctoys.com/index.php/rest/V1/app/dataextractionnew/orderlist/?from="+from_date+"&to="+to_date,"exn50dak2a5iahy02hawo5il0y6j25ct","ELC"],
+				"MIK" : ["https://mikyajy.com/rest/V1/orderlist/?from="+str(fromdate_mik)+"&to="+str(todate_mik),str(tokenresponse.json()),"MIK"]
+				}
+	for i in cmslist:
+		try:
+			headers = {'content-type': 'application/json',"Authorization": 'Bearer '+cmslist[i][1]}
+			response = requests.get(cmslist[i][0],headers=headers)
+			exstatus = ["ecom_cancelled","canceled","payment_pending","payfort_fort_failed"]
+			orders = {key:val for key, val in response.json()[0].items() if val not in  exstatus}
+			if response.json() :
+				posturl = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/add/"
+				querystring =  {  "line":str(tuple(orders.keys())),
+								  "brand":cmslist[i][2]
+							   }
+				postresponse = requests.post(posturl, data=json.dumps(querystring),headers=headers)
+		except:
+			continue
+	return "sucess"
+
+def omsmissed(request):
+	try:
+		url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/missed"
+		headers = {'content-type': 'application/json'}
+		missedresp= requests.get(url,headers=headers)
+		missed = missedresp.json()["items"]
+	except:
+		return render(request,'cmsdata.html',{'resp':"Failed"})
+	return missed
+
+
+def  omsreport(request):
+	try:
+		url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/status"
+		headers = {'content-type': 'application/json'}
+		reportresp = requests.get(url,headers=headers)
+		report = reportresp.json()["items"]
+		status_codes = []
+		outreport = []
+		for i in report:
+			if i["status_desc"] not in status_codes:
+				status_codes.append(i["status_desc"])
+				outreport.append({i["status_desc"] : [{"ELC":0},{"MHR":0},{"NAY":0},{"TBS":0},{"MIK":0}]})
+		# for j in status_codes:
+		for k in report:
+			# if k["status_desc"] == j:
+			for m in outreport:
+				for key in m:
+					if key == k["status_desc"]:
+						for n in m[key]:
+							for key in n:
+								if key == k["brand_code"]:
+									n[key] = k["count(order_id)"]
+		dispreport = []
+		for i in outreport:
+				stausarr = []
+				total = 0
+				for p in i:
+					stausarr.append(p)
+					for k in i[p]:
+						for m in k:
+							stausarr.append(str(k[m]))
+							total = total+k[m] 
+					stausarr.append(str(total))
+				dispreport.append(stausarr)
+		grant_total = ['OMS ORDER COUNT',0,0,0,0,0,0]
+		for arr in dispreport:
+			for t in range(len(arr)):
+				if t !=0:
+					grant_total[t]= grant_total[t] + int(arr[t])
+		# dispreport.insert(0, grant_total)
+		dispreport.append(grant_total)
+
+				
+	except:
+		return render(request,'cmsdata.html',{'resp':"failed"})
+	return render(request,'omsreport.html',context={"resp": json.dumps(dispreport)})

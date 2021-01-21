@@ -1,0 +1,68 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div style="margin-right:-246px; text-align: right;font-size:15px;color:#FFF;margin-bottom: 20px;">
+  <i  style="background-color: #5A5A5A;cursor: pointer; border-radius: 2px"> 
+    <a href="cms" style="color:#FFF; text-decoration: none;">Missed Orders</a>
+  </i>
+</div>  
+<table id="customers">
+  <tr>
+    <th>STATUS</th>
+    <th>ELC</th>
+    <th>MHR</th>
+    <th>NAY</th>
+    <th>TBS</th>
+    <th>MIK</th>
+    <th>GRAND TOTAL</th>
+  </tr>
+</table>
+
+<style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+
+<script type="text/javascript">
+
+function generate_table (){
+	var tbl = document.getElementById('customers')
+	const  mydata = {{ resp|safe }};
+    for (var j = 0; j < mydata.length; j++) {
+      // Create a <td> element and a text node, make the text
+      // node the contents of the <td>, and put the <td> at
+      // the end of the table row
+    var row = document.createElement('tr');
+    for( var i=0;i<mydata[j].length;++i){
+      th = document.createElement('td');
+      th.innerHTML = JSON.parse(JSON.stringify(mydata[j][i]));
+      row.appendChild(th);
+    }
+    tbl.appendChild(row);
+    }
+}
+window.onload = generate_table;
+
+</script>
+
+{% endblock %}
