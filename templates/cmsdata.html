@@ -56,8 +56,8 @@ function missed_table (){
       th = document.createElement('td');
       th.innerHTML = JSON.parse(JSON.stringify(mydata[j]['brand']));
       row.appendChild(th);
+      tbl.appendChild(row);
     }
-    tbl.appendChild(row);
  
 }
 window.onload = missed_table;
