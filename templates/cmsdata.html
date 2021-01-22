@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+{% block content %}
+<div style="margin-right:-246px; text-align: left;font-size:15px;color:#FFF;margin-bottom: 20px;">
+  <i  class="fa fa-arrow-left" style="background-color: #5A5A5A;cursor: pointer; border-radius: 2px"> 
+    <a href="omsreport" style="color:#FFF; text-decoration: none;">BACK</a>
+  </i>
+</div> 
+	{% if resp|length > 0 %}
+		<table id="customers">
+		  <tr>
+		    <th>ORDER ID</th>
+		    <th>BRAND</th>
+		  </tr>
+		</table>
+	{% else %}
+		<div>NO ORDERS GOT MISSED !!!</div>
+	{% endif %}
+
+<style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+
+<script type="text/javascript">
+
+function missed_table (){
+	var tbl = document.getElementById('customers')
+	debugger;
+	const  mydata = {{ resp|safe }};
+    for (var j = 0; j < mydata.length; j++) {
+
+    var row = document.createElement('tr');
+      th = document.createElement('td');
+      th.innerHTML = JSON.parse(JSON.stringify(mydata[j]['order_id']));
+      row.appendChild(th);
+      th = document.createElement('td');
+      th.innerHTML = JSON.parse(JSON.stringify(mydata[j]['brand']));
+      row.appendChild(th);
+    }
+    tbl.appendChild(row);
+ 
+}
+window.onload = missed_table;
+
+</script>
+
+{% endblock %}

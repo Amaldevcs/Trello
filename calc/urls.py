@@ -21,5 +21,8 @@ urlpatterns = [
     path('urllist', views.urllist,name="urllist"),
     path('createurl', views.createurl,name="createurl"),
     path('posturl', views.posturl,name="posturl"),
-    path('oracle', views.oracle,name="oracle")
+    path('oracle', views.oracle,name="oracle"),
+    path('cms', views.cmsdata,name="cms"),
+    path('omsmissed', views.omsmissed,name="omsmissed"),
+    path('omsreport', views.omsreport,name="omsreport")
 ]
