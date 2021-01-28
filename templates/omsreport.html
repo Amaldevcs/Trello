@@ -1,7 +1,13 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<div style="margin-right:-246px; text-align: right;font-size:15px;color:#FFF;margin-bottom: 20px;">
+<form action="omsreport" method="get"enctype="multipart/form-data" style="text-align: left;">{% csrf_token %} 
+  FROM : <input type="date" id="startdate" name="startdate">
+  TO : <input type="date" id="todate" name="todate" value="2017-06-01">
+  <input type="submit"  id="submit" value="SUBMIT">
+</form>
+</div>
+<div style="text-align: right;font-size:15px;color:#FFF;margin-bottom: 20px;">
   <i  style="background-color: #5A5A5A;cursor: pointer; border-radius: 2px"> 
     <a href="cms" style="color:#FFF; text-decoration: none;">Missed Orders</a>
   </i>
@@ -48,7 +54,9 @@
 function generate_table (){
 	var tbl = document.getElementById('customers')
 	const  mydata = {{ resp|safe }};
-    for (var j = 0; j < mydata.length; j++) {
+  document.getElementById("startdate").value = mydata[mydata.length-1][0];
+  document.getElementById("todate").value = mydata[mydata.length-1][1];
+    for (var j = 0; j < mydata.length-1; j++) {
       // Create a <td> element and a text node, make the text
       // node the contents of the <td>, and put the <td> at
       // the end of the table row
