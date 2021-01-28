@@ -408,18 +408,12 @@ def  naycmsdata(request):
 	to_date = datetime.datetime.now().strftime("%d%m%Y")
 	todate_mik = datetime.date.today()
 	fromdate_mik = todate_mik - datetime.timedelta(days=1)
-	miktokenurl = "https://mikyajy.com/rest/V1/integration/admin/token"
-	cred = {
-			"username": "sandeep",
-			"password": "testkoj@123"
-			}
-	tokenresponse = requests.post(miktokenurl, data=json.dumps(cred),headers={'content-type': 'application/json'})
 	cmslist = {
 				"NAY" : ["https://cms.nayomi.com/index.php/rest/V1/app/dataextractionnew/orderlist?from="+from_date+"&to="+to_date,"q7fhtd4w5ysvzbsg8v86ydf6epnyhf2m","NAY"],
 				"MHR" : ["https://cms.mihyar.com/index.php/rest//V1/app/dataextractionnew/orderlist/?from="+from_date+"&to="+to_date,"ij6yeko9mb9gv5u2wt4o0wqnuuhf6m0k","MHR"],
 				"TBS" : ["https://cms-west.thebodyshop.com.sa/rest/V1/app/dataextractionnew/orderlist?from="+from_date+"&to="+to_date,"vbv8ehbgxp0lw9ocn0sleivythovkqvu","TBS"],
 				"ELC" : ["https://cms.elctoys.com/index.php/rest/V1/app/dataextractionnew/orderlist/?from="+from_date+"&to="+to_date,"exn50dak2a5iahy02hawo5il0y6j25ct","ELC"],
-				"MIK" : ["https://mikyajy.com/rest/V1/orderlist/?from="+str(fromdate_mik)+"&to="+str(todate_mik),str(tokenresponse.json()),"MIK"]
+				"MIK" : ["https://mikyajy.com/rest/V1/orderlist/?from="+str(fromdate_mik)+"&to="+str(todate_mik),"xat43fwtpxy11wjhns1tufevdb6tmfjc","MIK"]
 				}
 	for i in cmslist:
 		try:
@@ -449,8 +443,27 @@ def omsmissed(request):
 
 
 def  omsreport(request):
+	dates = []
+	from_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
+	to_date = datetime.datetime.now().strftime("%Y-%m-%d")
+	if request.method =='GET':
+		if 'startdate' in request.GET:
+			from_date = request.GET['startdate']
+			to_date = request.GET['todate']
+			from_date_arr = str(request.GET['startdate']).split('-')
+			to_date_arr = str(request.GET['todate']).split('-')
+			from_date_qury = (datetime.datetime(int(from_date_arr[0]), int(from_date_arr[1]), int(from_date_arr[2]))).strftime('%d-%b-%Y')
+			to_date_qury = (datetime.datetime(int(to_date_arr[0]), int(to_date_arr[1]), int(to_date_arr[2]))).strftime('%d-%b-%Y')
+		else:
+			from_date = (datetime.datetime.now()).strftime("%Y-%m-%d")
+			to_date = datetime.datetime.now().strftime("%Y-%m-%d")
+			from_date_qury = datetime.datetime.now().strftime('%d-%b-%Y')
+			to_date_qury = from_date_qury
+	dates.append(from_date)
+	dates.append(to_date)
 	try:
-		url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/status"
+		# url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/status"
+		url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/stat/"+str(from_date_qury)+"/"+str(to_date_qury)
 		headers = {'content-type': 'application/json'}
 		reportresp = requests.get(url,headers=headers)
 		report = reportresp.json()["items"]
@@ -489,7 +502,7 @@ def  omsreport(request):
 					grant_total[t]= grant_total[t] + int(arr[t])
 		# dispreport.insert(0, grant_total)
 		dispreport.append(grant_total)
-
+		dispreport.append(dates)
 				
 	except:
 		return render(request,'cmsdata.html',{'resp':"failed"})
