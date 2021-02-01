@@ -420,6 +420,7 @@ def  naycmsdata(request):
 			headers = {'content-type': 'application/json',"Authorization": 'Bearer '+cmslist[i][1]}
 			response = requests.get(cmslist[i][0],headers=headers)
 			exstatus = ["ecom_cancelled","canceled","payment_pending","payfort_fort_failed"]
+			# exstatus = []
 			orders = {key:val for key, val in response.json()[0].items() if val not in  exstatus}
 			if response.json() :
 				posturl = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/add/"
@@ -427,6 +428,7 @@ def  naycmsdata(request):
 								  "brand":cmslist[i][2]
 							   }
 				postresponse = requests.post(posturl, data=json.dumps(querystring),headers=headers)
+				
 		except:
 			continue
 	return "sucess"
@@ -461,6 +463,20 @@ def  omsreport(request):
 			to_date_qury = from_date_qury
 	dates.append(from_date)
 	dates.append(to_date)
+
+	counturl = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/count"
+	headers = {'content-type': 'application/json'}
+	countresp = requests.get(counturl,headers=headers)
+	countmiss = []
+	missed_count = 0
+	date_last_updated = 0
+	for i in countresp.json()["items"]:
+		date_last_updated = i["max(created_date)"]
+		if i["status"] == "NOT AVAILABLE IN OMS":
+			missed_count = i["count(order_id)"]
+	countmiss.append(((datetime.datetime.strptime(date_last_updated, '%Y-%m-%dT%H:%M:%SZ')) + datetime.timedelta(hours = 5,minutes = 30)).strftime("%d/%m/%Y %H:%M:%S"))
+	countmiss.append(missed_count)
+ 
 	try:
 		# url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/status"
 		url = "http://ords.kojtechservices.com:9090/ords/wsdigital/cms/stat/"+str(from_date_qury)+"/"+str(to_date_qury)
@@ -495,15 +511,45 @@ def  omsreport(request):
 							total = total+k[m] 
 					stausarr.append(str(total))
 				dispreport.append(stausarr)
+		newreport = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		for ordstatus in dispreport:
+			if ordstatus[0] == 'DELIVERED':
+				newreport[0] = ordstatus
+			elif ordstatus[0] == '3PL Transit':
+				newreport[1] = ordstatus
+			elif ordstatus[0] == 'PICKED':
+				newreport[2] = ordstatus
+			elif ordstatus[0] == 'ACCEPTED':
+				newreport[3] = ordstatus
+			elif ordstatus[0] == 'NEW ORDER':
+				newreport[4] = ordstatus
+			elif ordstatus[0] == 'FULFILLED':
+				newreport[5] = ordstatus
+			elif ordstatus[0] == 'RECEIVED':
+				newreport[6] = ordstatus
+			elif ordstatus[0] == 'INTRANSIT POLLED':
+				newreport[7] = ordstatus
+			elif ordstatus[0] == 'INTRANSIT':
+				newreport[8] = ordstatus
+			elif ordstatus[0] == 'OPEN':
+				newreport[9] = ordstatus
+			elif ordstatus[0] == 'CANCELED':
+				newreport[10] = ordstatus
+			else:
+				newreport.append(ordstatus) 
+
 		grant_total = ['OMS ORDER COUNT',0,0,0,0,0,0]
 		for arr in dispreport:
 			for t in range(len(arr)):
 				if t !=0:
 					grant_total[t]= grant_total[t] + int(arr[t])
 		# dispreport.insert(0, grant_total)
-		dispreport.append(grant_total)
-		dispreport.append(dates)
-				
+		# dispreport.append(grant_total)
+		# dispreport.append(dates)
+		newreport.append(grant_total)
+		newreport.append(dates)
+		newreport.append(countmiss)
+		newreport = [i for i in newreport if i != 0]
 	except:
 		return render(request,'cmsdata.html',{'resp':"failed"})
-	return render(request,'omsreport.html',context={"resp": json.dumps(dispreport)})
+	return render(request,'omsreport.html',context={"resp": json.dumps(newreport)})
