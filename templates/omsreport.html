@@ -7,11 +7,12 @@
   <input type="submit"  id="submit" value="SUBMIT">
 </form>
 </div>
-<div style="text-align: right;font-size:15px;color:#FFF;margin-bottom: 20px;">
+<div style="text-align: right;font-size:15px;color:#FFF; margin-bottom: 10px;">
   <i  style="background-color: #5A5A5A;cursor: pointer; border-radius: 2px"> 
-    <a href="cms" style="color:#FFF; text-decoration: none;">Missed Orders</a>
+    <a id='missedorder'href="cms" style="color:#FFF; text-decoration: none;"></a>
   </i>
-</div>  
+</div>
+<div id="lastupdate" style="text-align: right;margin-bottom: 20px;"></div>  
 <table id="customers">
   <tr>
     <th>STATUS</th>
@@ -54,9 +55,11 @@
 function generate_table (){
 	var tbl = document.getElementById('customers')
 	const  mydata = {{ resp|safe }};
-  document.getElementById("startdate").value = mydata[mydata.length-1][0];
-  document.getElementById("todate").value = mydata[mydata.length-1][1];
-    for (var j = 0; j < mydata.length-1; j++) {
+  document.getElementById("startdate").value = mydata[mydata.length-2][0];
+  document.getElementById("todate").value = mydata[mydata.length-2][1];
+  document.getElementById("missedorder").innerHTML  = mydata[mydata.length-1][1] + " Missed Orders";
+  document.getElementById("lastupdate").innerHTML  = "Last updated on : "+mydata[mydata.length-1][0] 
+    for (var j = 0; j < mydata.length-2; j++) {
       // Create a <td> element and a text node, make the text
       // node the contents of the <td>, and put the <td> at
       // the end of the table row
