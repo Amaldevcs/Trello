@@ -301,9 +301,7 @@ def getboard_id(shortlink):
     querystring = {"key":"6f4a1f510eb5f2f66917c8d322ec3cb8","token":"8ed88f5844ec6a137a8614f9aa88994e5da4c146495275ee87ac1ead818c1a1f"}
     # response = requests.request("GET", urlshrt, params=querystring)
     try:
-    	print("GDFHFHGFHGHGFHGHGHGF")
     	response = requests.request("GET", urlshrt, params=querystring)
-    	print(response)
     	return response.json()["id"]
     except:
     	return "123123"
@@ -513,30 +511,33 @@ def  omsreport(request):
 				dispreport.append(stausarr)
 		newreport = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 		for ordstatus in dispreport:
-			if ordstatus[0] == 'DELIVERED':
+
+			if ordstatus[0] == 'NEW ORDER':
 				newreport[0] = ordstatus
-			elif ordstatus[0] == '3PL Transit':
+			elif ordstatus[0] == 'ACCEPTED':
 				newreport[1] = ordstatus
 			elif ordstatus[0] == 'PICKED':
 				newreport[2] = ordstatus
-			elif ordstatus[0] == 'ACCEPTED':
+			elif ordstatus[0] == '3PL Transit':
 				newreport[3] = ordstatus
-			elif ordstatus[0] == 'NEW ORDER':
+			elif ordstatus[0] == 'INTRANSIT':
 				newreport[4] = ordstatus
-			elif ordstatus[0] == 'FULFILLED':
+			elif ordstatus[0] == 'INTRANSIT POLLED':
 				newreport[5] = ordstatus
 			elif ordstatus[0] == 'RECEIVED':
 				newreport[6] = ordstatus
-			elif ordstatus[0] == 'INTRANSIT POLLED':
+			elif ordstatus[0] == 'FULFILLED':
 				newreport[7] = ordstatus
-			elif ordstatus[0] == 'INTRANSIT':
+			elif ordstatus[0] == 'DELIVERED':
+
 				newreport[8] = ordstatus
 			elif ordstatus[0] == 'OPEN':
 				newreport[9] = ordstatus
 			elif ordstatus[0] == 'CANCELED':
 				newreport[10] = ordstatus
 			else:
-				newreport.append(ordstatus) 
+				newreport.append(ordstatus)
+
 
 		grant_total = ['OMS ORDER COUNT',0,0,0,0,0,0]
 		for arr in dispreport:
@@ -546,10 +547,14 @@ def  omsreport(request):
 		# dispreport.insert(0, grant_total)
 		# dispreport.append(grant_total)
 		# dispreport.append(dates)
+		cms_order_count = grant_total.copy()
+		cms_order_count[0] = 'CMS ORDER COUNT'
 		newreport.append(grant_total)
 		newreport.append(dates)
 		newreport.append(countmiss)
 		newreport = [i for i in newreport if i != 0]
+		newreport.insert(0,cms_order_count)
+
 	except:
 		return render(request,'cmsdata.html',{'resp':"failed"})
 	return render(request,'omsreport.html',context={"resp": json.dumps(newreport)})
